@@ -1,8 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import { Error as MongooseError } from 'mongoose';
 
 import Product from '../models/product';
-import BadRequestError from '../errors/bad-request-error';
 import ConflictError from '../errors/conflics-error';
 
 // Получение всех товаров
@@ -10,14 +8,14 @@ const getAllProducts = async (_req: Request, res: Response, next: NextFunction) 
   try {
     const products = await Product.find({});
     res.set('Content-Type', 'application/json');
-    res.status(200).json(
+    return res.status(200).json(
       {
         items: products,
         total: products.length,
       },
     );
   } catch (error) {
-    next(error);
+    return next(error);
   }
 };
 
@@ -44,9 +42,6 @@ const createProduct = async (req: Request, res: Response, next: NextFunction) =>
     res.set('Content-Type', 'application/json');
     return res.status(201).json(product);
   } catch (error) {
-    if (error instanceof MongooseError.ValidationError) {
-      return next(new BadRequestError('Ошибка валидации данных при создании товара'));
-    }
     if (error instanceof Error && error.message.includes('E11000')) {
       return next(new ConflictError('Товар с таким title уже существует'));
     }

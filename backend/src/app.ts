@@ -9,6 +9,7 @@ import orderRoutes from './routes/order';
 import errorHandler from './middlewares/error-handler';
 import { requestLogger, errorLogger } from './middlewares/logger';
 import NotFoundError from './errors/not-found-error';
+import celebrateErrorHandler from './middlewares/celebrate-error-handler';
 
 const app = express();
 mongoose.connect(config.db.address);
@@ -25,6 +26,7 @@ app.use('*', (_req, _res, next) => {
 });
 
 app.use(errorLogger); // логирование ошибок
+app.use(celebrateErrorHandler);
 app.use(errorHandler);
 
 app.listen(3000, () => {
